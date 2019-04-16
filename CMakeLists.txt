@@ -18,4 +18,5 @@ add_subdirectory(Granite EXCLUDE_FROM_ALL)
 
 add_granite_offline_tool(01-device-creation 01_device_creation.cpp)
 add_granite_offline_tool(02-object-creation 02_object_creation.cpp)
+add_granite_offline_tool(03-frame-contexts 03_frame_contexts.cpp)
 

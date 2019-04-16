@@ -132,4 +132,6 @@ int main()
 
 	// Suppress warning.
 	(void)view;
+
+	// All the objects will go out of scope here, and their memory are cleaned up.
 }

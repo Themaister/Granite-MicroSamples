@@ -31,7 +31,7 @@ int main()
 	// It is possible to pass in a custom pointer to vkGetInstanceProcAddr.
 	// This is useful if the user loads the Vulkan loader in a custom way
 	// and we can bootstrap ourselves straight from vkGetInstanceProcAddr rather
-	// than loading Vulkan dynamically.
+	// than loading Vulkan dynamically. This is common for GLFW for example.
 	if (!Vulkan::Context::init_loader(nullptr))
 	{
 		LOGE("Failed to create loader!\n");
@@ -64,5 +64,5 @@ int main()
 	device.set_context(context);
 
 	// Granite is a C++ project and thus takes advantage of RAII.
-	// We get appropriate cleanup here.
+	// We get appropriate cleanup here when device and context go out of scope.
 }

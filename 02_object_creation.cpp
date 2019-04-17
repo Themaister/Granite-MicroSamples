@@ -24,7 +24,7 @@
 #include "device.hpp"
 #include "util.hpp"
 
-Vulkan::BufferHandle create_buffer(Vulkan::Device &device)
+static Vulkan::BufferHandle create_buffer(Vulkan::Device &device)
 {
 	// Like raw Vulkan, we have creation structs, although they are default-initialized since this is C++.
 	Vulkan::BufferCreateInfo info;
@@ -45,8 +45,8 @@ Vulkan::BufferHandle create_buffer(Vulkan::Device &device)
 	// the backend will add in transfer usage flags as required.
 	info.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
-	// Misc creation flags which don't exist in Vulkan. It's possible to request the buffer to be cleared
-	// on creation. For Device-only types, this means allocating a command buffer and submitting that.
+	// Misc creation flags which don't exist in Vulkan. It's possible to request the buffer to be cleared to zero
+	// on creation for example. For Device-only types, this means allocating a command buffer and submitting that.
 	// Barriers are taken care of automatically.
 	info.misc = 0;
 
@@ -60,7 +60,7 @@ Vulkan::BufferHandle create_buffer(Vulkan::Device &device)
 	return buffer;
 }
 
-Vulkan::ImageHandle create_image(Vulkan::Device &device)
+static Vulkan::ImageHandle create_image(Vulkan::Device &device)
 {
 	// immutable_2d_image sets up a create info struct which matches what we want.
 	Vulkan::ImageCreateInfo info = Vulkan::ImageCreateInfo::immutable_2d_image(4, 4, VK_FORMAT_R8G8B8A8_UNORM);
@@ -74,6 +74,7 @@ Vulkan::ImageHandle create_image(Vulkan::Device &device)
 	info.levels = 0;
 
 	// We can request mips to be generated automatically.
+	// In this case, we only upload the first mip level.
 	info.misc = Vulkan::IMAGE_MISC_GENERATE_MIPS_BIT;
 
 	Vulkan::ImageInitialData initial_data = {};

@@ -32,5 +32,8 @@ add_granite_offline_tool(05-descriptor-sets-and-binding-model 05_descriptor_sets
 if (SDL2_FOUND)
     add_granite_offline_tool(06-wsi-sdl2 06_wsi_sdl2.cpp)
     target_link_libraries(06-wsi-sdl2 PRIVATE SDL2::SDL2)
+
+    add_granite_offline_tool(07-linear-allocators 07_linear_allocators.cpp)
+    target_link_libraries(07-linear-allocators PRIVATE SDL2::SDL2)
 endif()
 

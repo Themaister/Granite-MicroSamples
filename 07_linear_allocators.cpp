@@ -276,7 +276,7 @@ static bool run_application(SDL_Window *window)
 int main()
 {
 	// Copy-pastaed from sample 06.
-	SDL_Window *window = SDL_CreateWindow("06-wsi-sdl2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	SDL_Window *window = SDL_CreateWindow("07-linear-allocators", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                                      640, 360,
 	                                      SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
 	if (!window)

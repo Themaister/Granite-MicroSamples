@@ -35,5 +35,8 @@ if (SDL2_FOUND)
 
     add_granite_offline_tool(07-linear-allocators 07_linear_allocators.cpp)
     target_link_libraries(07-linear-allocators PRIVATE SDL2::SDL2)
+
+    add_granite_offline_tool(08-render-passes 08_render_passes.cpp)
+    target_link_libraries(08-render-passes PRIVATE SDL2::SDL2)
 endif()
 

@@ -26,6 +26,7 @@
 #include "util.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
+#include <future>
 
 // See sample 06 for details.
 struct SDL2Platform : Vulkan::WSIPlatform
@@ -108,7 +109,7 @@ static bool run_application(SDL_Window *window)
 
 	// In this sample we are going to render to an off-screen surface in the graphics queue,
 	// copy it back to the user in the transfer/DMA queue and read the results.
-	// NOTE: This is a pretty ridiculous way to use multiple queues in Vulkan, but this is the shortest example I can
+	// NOTE: This is a pretty silly way to use multiple queues in Vulkan, but this is the shortest example I can
 	// think of where we demonstrate barriers, readbacks, image layouts, semaphores and fences.
 
 	Vulkan::ImageCreateInfo rt_info = Vulkan::ImageCreateInfo::render_target(4, 4, VK_FORMAT_R8G8B8A8_UNORM);
@@ -217,10 +218,26 @@ static bool run_application(SDL_Window *window)
 		transfer_cmd->barrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_ACCESS_TRANSFER_WRITE_BIT,
 		                      VK_PIPELINE_STAGE_HOST_BIT, VK_ACCESS_HOST_READ_BIT);
 
-		// Signal a manual fence. The fence will signal once the readback is complete, and then we can read back the data.
+		// Signal a fence. The fence will signal once the readback is complete, and then we can read back the data.
 		// This is very straight forward.
 		Vulkan::Fence readback_fence;
 		device.submit(transfer_cmd, &readback_fence);
+
+		// We can wait for the fence on a thread async and read the result there.
+		// We transfer shared ownership of the handles to the thread now, so we must
+		// capture readback_fence and buffer_readback by value.
+		std::async(std::launch::async, [&device, readback_fence, buffer_readback]() mutable {
+			readback_fence->wait();
+
+			// The only thing mapping buffers does is to potentially invalidate CPU caches,
+			// no vkMapMemory overhead and other shenanigans.
+			auto *data = static_cast<const uint32_t *>(device.map_host_buffer(*buffer_readback, Vulkan::MEMORY_ACCESS_READ_BIT));
+			for (unsigned y = 0; y < 4; y++)
+				for (unsigned x = 0; x < 4; x++)
+					LOGI("Pixel %u, %u is: 0x%08x\n", x, y, data[y * 4 + x]);
+
+			device.unmap_host_buffer(*buffer_readback, Vulkan::MEMORY_ACCESS_READ_BIT);
+		});
 
 		// Just render something to the swapchain.
 		graphics_cmd = device.request_command_buffer();
@@ -228,6 +245,9 @@ static bool run_application(SDL_Window *window)
 		graphics_cmd->begin_render_pass(rp);
 		graphics_cmd->end_render_pass();
 		device.submit(graphics_cmd);
+
+		// As we expect, semaphores and fences are recycled using the frame context to know when to recycle the VkSemaphore
+		// and VkFence objects back to the fence/semaphore pools.
 
 		wsi.end_frame();
 	}

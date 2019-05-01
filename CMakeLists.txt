@@ -41,5 +41,8 @@ if (SDL2_FOUND)
 
     add_granite_offline_tool(09-synchronization 09_synchronization.cpp)
     target_link_libraries(09-synchronization PRIVATE SDL2::SDL2)
+
+    add_granite_offline_tool(10-pipelines 10_pipelines.cpp)
+    target_link_libraries(10-pipelines PRIVATE SDL2::SDL2)
 endif()
 
